@@ -1,0 +1,81 @@
+CREATE OR REPLACE VIEW `laboratoria4-434817.DataLab.cleaned_amazon_product` AS
+SELECT DISTINCT 
+  product_id, 
+  product_name, 
+  discounted_price, 
+  actual_price, 
+  (actual_price - discounted_price) AS discount_value_in_currency,  -- Variable de descuento en moneda
+  discount_percentage, 
+  category,
+  CASE
+    WHEN discount_percentage = 0 THEN 'Sin descuento'
+    WHEN discount_percentage > 0 AND discount_percentage <= 0.25 THEN 'Descuento bajo'
+    WHEN discount_percentage > 0.25 AND discount_percentage <= 0.50 THEN 'Descuento medio'
+    WHEN discount_percentage > 0.50 AND discount_percentage <= 0.75 THEN 'Descuento Alto'
+    ELSE 'Remate'
+  END AS discount_category
+FROM 
+  `laboratoria4-434817.DataLab.amazon_product`
+WHERE product_id IS NOT NULL;
+
+
+CREATE OR REPLACE VIEW `laboratoria4-434817.DataLab.cleaned_product_category` AS
+SELECT 
+  product_id, 
+  REGEXP_REPLACE(product_name, r'[^a-zA-Z0-9 ]', '') AS cleaned_product_name,
+  REGEXP_REPLACE(SPLIT(category, '|')[SAFE_OFFSET(0)], r'[^a-zA-Z0-9 ]', '') AS category_level_1,
+  REGEXP_REPLACE(SPLIT(category, '|')[SAFE_OFFSET(1)], r'[^a-zA-Z0-9 ]', '') AS category_level_2,
+  REGEXP_REPLACE(SPLIT(category, '|')[SAFE_OFFSET(2)], r'[^a-zA-Z0-9 ]', '') AS category_level_3,
+  REGEXP_REPLACE(SPLIT(category, '|')[SAFE_OFFSET(3)], r'[^a-zA-Z0-9 ]', '') AS category_level_4,
+  REGEXP_REPLACE(SPLIT(category, '|')[SAFE_OFFSET(4)], r'[^a-zA-Z0-9 ]', '') AS category_level_5,
+  discounted_price, 
+  actual_price, 
+  discount_percentage
+FROM `laboratoria4-434817.DataLab.amazon_product`
+WHERE product_id IS NOT NULL
+GROUP BY product_id, product_name, discounted_price, actual_price, discount_percentage, category;
+
+
+CREATE OR REPLACE VIEW `laboratoria4-434817.DataLab.cleaned_amazon_review` AS
+SELECT 
+  product_id, 
+  review_title, 
+  review_content,
+  rating,
+  rating_count,
+  CASE
+    WHEN SAFE_CAST(REGEXP_REPLACE(rating, r'[^0-9.]', '') AS FLOAT64) IS NULL THEN 'Sin calificación'
+    ELSE CASE
+      WHEN SAFE_CAST(REGEXP_REPLACE(rating, r'[^0-9.]', '') AS FLOAT64) <= 1.0 THEN 'Muy bajo'
+      WHEN SAFE_CAST(REGEXP_REPLACE(rating, r'[^0-9.]', '') AS FLOAT64) <= 2.5 THEN 'Bajo'
+      WHEN SAFE_CAST(REGEXP_REPLACE(rating, r'[^0-9.]', '') AS FLOAT64) <= 3.5 THEN 'Medio'
+      WHEN SAFE_CAST(REGEXP_REPLACE(rating, r'[^0-9.]', '') AS FLOAT64) <= 4.5 THEN 'Alto'
+      ELSE 'Muy alto'
+    END
+  END AS categoria_rating
+FROM 
+  `laboratoria4-434817.DataLab.amazon_review`
+WHERE product_id IS NOT NULL
+GROUP BY product_id, review_title, review_content, rating, rating_count;
+
+
+CREATE OR REPLACE TABLE `laboratoria4-434817.DataLab.final_amazon_data` AS 
+SELECT DISTINCT  -- Asegura que los registros sean únicos
+  p.product_id, 
+  p.product_name, 
+  p.discounted_price, 
+  p.actual_price, 
+  p.discount_category,
+  p.discount_percentage,
+  p.discount_value_in_currency, 
+  c.category_level_1, 
+  c.category_level_2,
+  c.category_level_3,
+  r.average_rating,
+  r.total_ratings,
+  r.categoria_rating
+FROM `laboratoria4-434817.DataLab.cleaned_amazon_product` p
+JOIN `laboratoria4-434817.DataLab.cleaned_amazon_review` r
+ON p.product_id = r.product_id
+JOIN `laboratoria4-434817.DataLab.cleaned_product_category` c
+ON p.product_id = c.product_id;

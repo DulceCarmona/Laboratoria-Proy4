@@ -18,7 +18,7 @@ Analizar los datos de productos de Amazon (precios, descuentos, calificaciones, 
 - Conexión de datos: Los datos fueron conectados a BigQuery y cargados después de descomprimir los archivos.
 - Limpieza de datos: Se identificaron y gestionaron valores nulos y duplicados en las dos tablas clave usando SQL.
 - Creación de variables: Se crearon nuevas variables para categorizar de acuerdo a los porcentajes de descuento y las calificaciones de las reseñas.
-- Unión de tablas: Mediante el uso de JOIN, se combinaron las tres tablas principales para obtener un dataset con 35,546 registros únicos.
+- Unión de tablas: Mediante el uso de JOIN, se combinaron las tres tablas principales para obtener un dataset con 1,355 registros únicos.
 - Agrupación y visualización de variables: Las variables categóricas se agruparon usando Power BI, visualizando los resultados mediante gráficos de barras y circulares.
 - Visualización de resultados: Se desarrolló un dashboard interactivo en Looker Studio para facilitar la comprensión del análisis y soportar la toma de decisiones.
 ### Hipótesis

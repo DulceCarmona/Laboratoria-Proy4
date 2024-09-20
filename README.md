@@ -42,3 +42,4 @@ Analizar los datos de productos de Amazon (precios, descuentos, calificaciones, 
 - **Para vendedores:**  Enfocarse en la calidad del producto y en la experiencia del cliente. Esto mejora las calificaciones y refuerza la imagen de Amazon como una plataforma confiable, donde los clientes están dispuestos a pagar por productos de valor.
 - **Para consumidores:** Evaluar la calidad en función del precio y la categoría. Aunque los productos más caros suelen tener mejores calificaciones, no siempre es así. Los compradores deben equilibrar el precio, las reseñas y la categoría para tomar la mejor decisión.
 # Visualización
+**DASHBOARD** https://lookerstudio.google.com/reporting/12c8a677-3809-4da3-aa50-4b4c0b655856
